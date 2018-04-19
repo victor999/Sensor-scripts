@@ -2,6 +2,8 @@
 
 Scripts for scanning BLE sensors on Raspberry Pi and write data to different systems
 
+Bluetooth Sensors can be bought at https://www.tindie.com/products/11856/
+
 Currently supported
 
 - mySQL DB
