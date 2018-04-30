@@ -25,6 +25,10 @@ sudo pip install bluepy
 <br>
 <br>
 - Thingspeak
+<br>
+<br>
+
+My thingspeak channel for the outside sensor can be seen at https://thingspeak.com/channels/468633
 
 <br>
 <br>
@@ -68,7 +72,7 @@ password = YourPassword
 <br>
 sudo pip install m2x
 
-Create a file /home/pi/mx.2 wit the following content
+Create a file /home/pi/mx.2 with the following content
 <br>
 <br>
 mac_address
