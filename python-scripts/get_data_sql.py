@@ -93,43 +93,44 @@ class ScanHandler(btle.DefaultDelegate):
             try:
                 print(row[1])
                 if(dev.addr == row[1]):
-                    print(hex(ord(dev.rawData[11])))
-                    print(hex(ord(dev.rawData[12])))
+                    if(isNewDev):
+                        print(hex(ord(dev.rawData[11])))
+                        print(hex(ord(dev.rawData[12])))
 
-                    tempValStr = str(format(ord(dev.rawData[12]), 'x')) + str('{:02x}'.format(ord(dev.rawData[11]), 'x'))
-                    print("tempValStr")
-                    print(tempValStr);
-                    
-                    tempVal2 = int(tempValStr, 16)
-
-                    print("tempVal2")
-                    print(tempVal2);
-                    
-                    if tempVal2 > 0x7FFF:
-                        tempVal2 -= 0x10000
-                    print("Temperature")
-                    print(str(tempVal2))
-
-                    temperature2 = float(tempVal2) / 100
-
-                    batValData = int(hex(ord(dev.rawData[17])), 16)
-                    print(hex(ord(dev.rawData[17])))
-                    print(str(batValData))
-                    batVal = batValData / 10.0
-                    print("Battery")
-                    print(str(batVal))
-
-                    timeTagVal = 0
-
-                    sql = "INSERT INTO SensorData(BatteryLevel, Temperature, ElapsedTime, MacAddress) VALUES('" + str(batVal) +"', '" + str(temperature2) + "', '" + str(timeTagVal) + "', '" + dev.addr + "');"
-                    print(sql)
-                    try:
-                        cursor.execute(sql)
-                        db.commit()
-                    except:
-                        db.rollback()
+                        tempValStr = str(format(ord(dev.rawData[12]), 'x')) + str('{:02x}'.format(ord(dev.rawData[11]), 'x'))
+                        print("tempValStr")
+                        print(tempValStr);
                         
-                    db.close                       
+                        tempVal2 = int(tempValStr, 16)
+
+                        print("tempVal2")
+                        print(tempVal2);
+                        
+                        if tempVal2 > 0x7FFF:
+                            tempVal2 -= 0x10000
+                        print("Temperature")
+                        print(str(tempVal2))
+
+                        temperature2 = float(tempVal2) / 100
+
+                        batValData = int(hex(ord(dev.rawData[17])), 16)
+                        print(hex(ord(dev.rawData[17])))
+                        print(str(batValData))
+                        batVal = batValData / 10.0
+                        print("Battery")
+                        print(str(batVal))
+
+                        timeTagVal = 0
+
+                        sql = "INSERT INTO SensorData(BatteryLevel, Temperature, ElapsedTime, MacAddress) VALUES('" + str(batVal) +"', '" + str(temperature2) + "', '" + str(timeTagVal) + "', '" + dev.addr + "');"
+                        print(sql)
+                        try:
+                            cursor.execute(sql)
+                            db.commit()
+                        except:
+                            db.rollback()
+                            
+                        db.close                       
                         
             except:
                print("Error: unable to fecth data")       
