@@ -27,7 +27,6 @@ sudo pip install bluepy
 <br>
 <br>
 
-My thingspeak channel for the outside sensor can be seen at https://thingspeak.com/channels/468633
 
 <br>
 <br>
