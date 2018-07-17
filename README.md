@@ -13,6 +13,8 @@ Currently supported
 
 - io.adafruit
 
+- weather underground https://www.wunderground.com/
+
 <br>
 <br>
 
