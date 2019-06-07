@@ -10,12 +10,12 @@ import argparse
 import binascii
 import os
 import sys
+from time import gmtime, strftime
 from bluepy import btle
-import urllib2
-import thingspeak
-import re
 
-F = open("/home/pi/thing.sp", "r")
+import thingspeak
+
+F = open("/home/pi/thing-env.sp", "r")
 mac_address = F.readline().replace('\n', '')
 mac_address = mac_address.replace('\r', '')
 channel_id = F.readline().replace('\n', '')
@@ -91,9 +91,9 @@ class ScanHandler(btle.DefaultDelegate):
         self.opts = opts
 
     def handleDiscovery(self, dev, isNewDev, isNewData):
-        
-        if dev.rssi < self.opts.sensitivity:
-            return
+
+        #if dev.rssi < self.opts.sensitivity:
+        #    return
 
         if(dev.addr == mac_address):
             print(dev.addr)
@@ -104,12 +104,12 @@ class ScanHandler(btle.DefaultDelegate):
             tempValStr = str(format(ord(dev.rawData[12]), 'x')) + str('{:02x}'.format(ord(dev.rawData[11]), 'x'))
             print("tempValStr")
             print(tempValStr);
-            
+
             tempVal2 = int(tempValStr, 16)
 
             print("tempVal2")
             print(tempVal2);
-            
+
             if tempVal2 > 0x7FFF:
                 tempVal2 -= 0x10000
             print("Temperature")
@@ -118,23 +118,42 @@ class ScanHandler(btle.DefaultDelegate):
             g_temperature = float(tempVal2) / 100
             print(g_temperature)
 
-            print("Battery")
-            batValData = int(hex(ord(dev.rawData[17])), 16)
-            print(hex(ord(dev.rawData[17])))
-            print(str(batValData))
-            g_batVal = batValData / 10.0           
-            print(str(g_batVal))
-            ext_ip = urllib2.urlopen('http://ifconfig.me/ip').read()
-            print ("Checking in from IP#: %s " % ext_ip)
-            temp = re.findall(r'\d+', ext_ip)
-            res = list(map(int, temp))
-            print(str(res))
+            print("Pressure")
+	    pressValStr = str(format(ord(dev.rawData[20]), 'x')) + str(format(ord(dev.rawData[19]), 'x')) + str(format(ord(dev.rawData[18]), 'x')) + str('{:02x}'.format(ord(dev.rawData[17]), 'x'))
+            print(pressValStr);
+	    pressureData = int(pressValStr, 16)
+            print(str(pressureData))
+            g_pressure = pressureData / 1000.0
+            print(str(g_pressure))
+
+
+	    print("Humidity")
+            humValStr = str(format(ord(dev.rawData[26]), 'x')) + str('{:02x}'.format(ord(dev.rawData[25]), 'x'))
+            print(humValStr);
+            humidityData = int(humValStr, 16)
+            print(str(humidityData))
+            g_humidity = humidityData / 100
+            print(str(g_humidity))
 
             if(isNewDev):
-                channel.update({1:g_temperature, 2:g_batVal})
+                channel.update({1:g_temperature, 2:g_humidity, 3:g_pressure})
+		f=open("th_sp.log", "a+")
+		f.write(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+		f.write("\n")
+		f.write(pressValStr)
+		f.write("\n")
+		f.write(str(pressureData))
+		f.write("\n")
+		f.write(str(g_pressure))
+		f.write("\n")
+		f.write(humValStr)
+		f.write("\n")
+		f.write(str(humidityData))
+		f.write("\n")
+		f.write(str(g_humidity))
+		f.write("\n")
+		f.close()
 
-                        
-            
 
 def main():
 
