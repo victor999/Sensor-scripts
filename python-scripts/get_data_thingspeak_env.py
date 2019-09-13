@@ -12,10 +12,18 @@ import os
 import sys
 from time import gmtime, strftime
 from bluepy import btle
+import sys
 
 import thingspeak
 
-F = open("/home/pi/thing-env.sp", "r")
+if len(sys.argv) == 2:
+        filename = str(sys.argv[1])       
+else:
+        filename = '/home/pi/thing-env.sp'
+
+print(filename)
+
+F = open(filename, "r")
 mac_address = F.readline().replace('\n', '')
 mac_address = mac_address.replace('\r', '')
 channel_id = F.readline().replace('\n', '')
@@ -119,15 +127,14 @@ class ScanHandler(btle.DefaultDelegate):
             print(g_temperature)
 
             print("Pressure")
-	    pressValStr = str(format(ord(dev.rawData[20]), 'x')) + str(format(ord(dev.rawData[19]), 'x')) + str(format(ord(dev.rawData[18]), 'x')) + str('{:02x}'.format(ord(dev.rawData[17]), 'x'))
-            print(pressValStr);
-	    pressureData = int(pressValStr, 16)
+            pressValStr = str(format(ord(dev.rawData[20]), 'x')) + str(format(ord(dev.rawData[19]), 'x')) + str(format(ord(dev.rawData[18]), 'x')) + str('{:02x}'.format(ord(dev.rawData[17]), 'x'))
+            print(pressValStr)
+            pressureData = int(pressValStr, 16)
             print(str(pressureData))
             g_pressure = pressureData / 1000.0
             print(str(g_pressure))
 
-
-	    print("Humidity")
+            print("Humidity")
             humValStr = str(format(ord(dev.rawData[26]), 'x')) + str('{:02x}'.format(ord(dev.rawData[25]), 'x'))
             print(humValStr);
             humidityData = int(humValStr, 16)
@@ -157,29 +164,7 @@ class ScanHandler(btle.DefaultDelegate):
 
 def main():
 
-    chData = []
-
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('-i', '--hci', action='store', type=int, default=0,
-                        help='Interface number for scan')
-    parser.add_argument('-t', '--timeout', action='store', type=int, default=4,
-                        help='Scan delay, 0 for continuous')
-    parser.add_argument('-s', '--sensitivity', action='store', type=int, default=-128,
-                        help='dBm value for filtering far devices')
-    parser.add_argument('-d', '--discover', action='store_true',
-                        help='Connect and discover service to scanned devices')
-    parser.add_argument('-a', '--all', action='store_true',
-                        help='Display duplicate adv responses, by default show new + updated')
-    parser.add_argument('-n', '--new', action='store_true',
-                        help='Display only new adv responses, by default show new + updated')
-    parser.add_argument('-v', '--verbose', action='store_true',
-                        help='Increase output verbosity')
-
-
-    arg = parser.parse_args(sys.argv[1:])
-
-    scanner = btle.Scanner(arg.hci).withDelegate(ScanHandler(arg))
+    scanner = btle.Scanner(0).withDelegate(ScanHandler(btle.DefaultDelegate))
 
     print (ANSI_RED + "Scanning for devices..." + ANSI_OFF)
     devices = scanner.scan(30)
